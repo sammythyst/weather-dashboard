@@ -11,7 +11,7 @@ header {
 }
 
 aside {
-    /* border: 1px solid black; */
+    background-color: whitesmoke;
     padding: 0rem 2rem;
 }
 
@@ -24,15 +24,14 @@ section {
     padding-left: 1rem;
 }
 
-.weather {
-    display: flex;
-}
-
-.searchBtn {
+button {
     background-color: cornflowerblue;
     color: white;
-    width: 100%;
     padding: .25rem;
+}
+
+.weather {
+    display: flex;
 }
 
 #prevSearch {
@@ -47,7 +46,3 @@ section {
     padding: .5rem;
     border-radius: 5px;
 }
-
-
-
-

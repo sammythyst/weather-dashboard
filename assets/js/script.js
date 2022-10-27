@@ -1,31 +1,73 @@
-// var apiKey = "b458229dd20c3c6d9b84f4e82ac7388a";
-// var city;
+var apiKey = "b458229dd20c3c6d9b84f4e82ac7388a";
+var searchForm = document.getElementById("searchForm"); 
+var cityEl = document.getElementById("cityInput");
+var cityList = document.getElementById("prevSearch");  
+var searchBtn = document.getElementById("searchBtn");
+var clearBtn = document.getElementById("clearBtn"); 
 
-var searchForm = document.querySelector('#searchForm');
+// array for searched cities
+var cities = [];
 
+// render items in search history as paragraph elements
+function renderLocal() {
+    // clear list each input to prevent duplicates
+    cityList.innerHTML = "";
 
-// actions for activating submit button
-function searchFormSubmit(event) {
+    // create new element for each entry
+    for (var i = 0; i < cities.length; i++) {
+        var city = cities[i];
+
+        var li = document.createElement("p");
+        li.textContent = city;
+        li.setAttribute("data-index", i);
+
+        cityList.appendChild(li);
+    }
+}
+
+// loads localstorage on page load
+function init() {
+    // gets stored cities from localstorage
+    var storedCities = JSON.parse(localStorage.getItem("cities"));
+
+    // update array with new entry
+    if (storedCities !== null) {
+        cities = storedCities;
+    }
+    renderLocal();
+}
+
+function storeCities() {
+    //set key in localstorage and city array
+    localStorage.setItem("cities", JSON.stringify(cities));
+}
+
+// submits form 
+searchForm.addEventListener("submit", function(event) {
     event.preventDefault();
-    
-    // get the value from the input field
-    var cityInputVal = document.querySelector('#cityInput').value;
 
-    // checks if value 
-    if (!cityInputVal) {
-        alert("Please input a city name.");
-    } else {
-        var prevSearch = document.createElement('p');
-        prevSearch.textContent = cityInputVal;
+    // defines input value
+    var cityInput = cityEl.value.trim();
 
-        var prevList = document.getElementById("prevSearch");
-        prevList.appendChild(prevSearch);
+    // 
+    if (cityInput === "") {
+        return;
+    }
 
-        console.log(localStorage);
-    
-    document.getElementById('cityInput').value = '';
-}
-}
+    // adds new city text to array and clears input
+    cities.push(cityInput);
+    cityEl.value = "";
 
+    // stores update city list and re-renders array
+    storeCities();
+    renderLocal();
+});
 
-searchForm.addEventListener('submit', searchFormSubmit);
+// clears search history on page and in localstorage
+clearBtn.addEventListener('click', function() {
+    localStorage.clear();
+    location.reload();
+});
+
+// calls funtion to run on page load
+init();
