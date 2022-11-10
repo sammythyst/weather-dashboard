@@ -1,15 +1,66 @@
-var apiKey = "b458229dd20c3c6d9b84f4e82ac7388a";
-var searchForm = document.getElementById("searchForm"); 
-var cityEl = document.getElementById("cityInput");
-var cityList = document.getElementById("prevSearch");  
-var searchBtn = document.getElementById("searchBtn");
-var clearBtn = document.getElementById("clearBtn"); 
 
+// buttons
+// searchBtn uses user input to search for a city
+$('#searchBtn').on('click', async function(event) {
+    event.preventDefault();
+    var cityEl = document.getElementById("cityInput");
+    let citySrc = $('#cityInput').val();
+
+    if (citySrc === "") {
+        return;
+    } else {
+        cities.push(citySrc);
+        cityEl.value = "";
+    }
+    document.getElementById("cityName").innerHTML = citySrc;
+
+    // fetch weather api
+    fetch('https://api.openweathermap.org/data/2.5/forecast?q=' + citySrc + '&units=imperial&appid=b458229dd20c3c6d9b84f4e82ac7388a')
+        .then(response => response.json())
+        .then(data => {
+            // for loops use api data to collect and print desired variables
+
+            for (i=0; i<6; i++) {
+                document.getElementById("img" + (i+1)).src = "http://openweathermap.org/img/wn/" + data.list[i].weather[0].icon + ".png";
+            }
+            
+            for(i=0; i<6; i++) {
+                document.getElementById("temp" + (i+1)).innerHTML = "Temp: " + data.list[i].main.temp.toFixed(0) + "°F";
+            }
+
+            for(i=0; i<6; i++) {
+                document.getElementById("wind" + (i+1)).innerHTML = "Wind: " + data.list[i].wind.speed + " mph";
+            }
+
+            for(i=0; i<6; i++) {
+                document.getElementById("humidity" + (i+1)).innerHTML = "Humidity: " + data.list[i].main.humidity + "%";
+            }
+        })
+
+    storeCities();
+    renderLocal();
+})
+
+// clears search history on page and in localstorage
+$('#clearBtn').on('click', function() {
+    localStorage.clear();
+    location.reload();
+});
+
+
+// localstorage
 // array for searched cities
 var cities = [];
 
-// render items in search history as paragraph elements
+// store searches in localstorage
+function storeCities() {
+    // set key in localstorage and city array
+    localStorage.setItem("cities", JSON.stringify(cities));
+}
+
+// render items in localstorage as paragraph elements
 function renderLocal() {
+    var cityList = document.getElementById("prevSearch");  
     // clear list each input to prevent duplicates
     cityList.innerHTML = "";
 
@@ -17,11 +68,13 @@ function renderLocal() {
     for (var i = 0; i < cities.length; i++) {
         var city = cities[i];
 
-        var li = document.createElement("p");
-        li.textContent = city;
-        li.setAttribute("data-index", i);
+        var newCity = document.createElement("p");
+        newCity.textContent = city;
+        $("newCity").on('click', function() {
+            $('#searchBtn');
+        })
 
-        cityList.appendChild(li);
+        cityList.appendChild(newCity);
     }
 }
 
@@ -37,37 +90,7 @@ function init() {
     renderLocal();
 }
 
-function storeCities() {
-    //set key in localstorage and city array
-    localStorage.setItem("cities", JSON.stringify(cities));
-}
 
-// submits form 
-searchForm.addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    // defines input value
-    var cityInput = cityEl.value.trim();
-
-    // 
-    if (cityInput === "") {
-        return;
-    }
-
-    // adds new city text to array and clears input
-    cities.push(cityInput);
-    cityEl.value = "";
-
-    // stores update city list and re-renders array
-    storeCities();
-    renderLocal();
-});
-
-// clears search history on page and in localstorage
-clearBtn.addEventListener('click', function() {
-    localStorage.clear();
-    location.reload();
-});
 
 // calls funtion to run on page load
 init();
